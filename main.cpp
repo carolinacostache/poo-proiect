@@ -2,7 +2,39 @@
 #include <string>
 #include <vector>
 
-class SkinCareProduct;
+class SkinCareProduct {
+private:
+    std::string productName;
+    double productPrice = 0.0;
+
+public:
+    SkinCareProduct() = default;
+
+    SkinCareProduct(const std::string& productName, double productPrice)
+            : productName(productName), productPrice(productPrice) {}
+
+
+    SkinCareProduct(const SkinCareProduct& other)
+            : productName(other.productName), productPrice(other.productPrice) {}
+
+
+    SkinCareProduct& operator=(const SkinCareProduct& other);
+
+
+    ~SkinCareProduct();
+
+    const std::string& getProductName() const {
+        return productName;
+    }
+
+    double getProductPrice() const {
+        return productPrice;
+    }
+
+    void displayProduct() const;
+
+    friend std::ostream& operator<<(std::ostream& out, const SkinCareProduct& product);
+};
 
 class ShoppingCart {
 private:
@@ -19,40 +51,6 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const ShoppingCart& cart);
 };
 
-class SkinCareProduct {
-private:
-    std::string productName;
-    double productPrice = 0.0;
-
-public:
-    SkinCareProduct() = default;
-
-    SkinCareProduct(const std::string& productName, double productPrice)
-            : productName(productName), productPrice(productPrice) {}
-
-    // Copy constructor
-    SkinCareProduct(const SkinCareProduct& other)
-            : productName(other.productName), productPrice(other.productPrice) {}
-
-    // Copy assignment operator
-    SkinCareProduct& operator=(const SkinCareProduct& other);
-
-    // Destructor
-    ~SkinCareProduct();
-
-    const std::string& getProductName() const {
-        return productName;
-    }
-
-    double getProductPrice() const {
-        return productPrice;
-    }
-
-    void displayProduct() const;
-
-    friend std::ostream& operator<<(std::ostream& out, const SkinCareProduct& product);
-};
-
 class SkinCareStore {
 private:
     static const int maxStockCapacity = 400;
@@ -66,13 +64,13 @@ public:
     SkinCareStore(const std::string& storeName, float storeReview)
             : storeName(storeName), storeReview(storeReview) {}
 
-    // Copy constructor
+
     SkinCareStore(const SkinCareStore& other);
 
-    // Copy assignment operator
+
     SkinCareStore& operator=(const SkinCareStore& other);
 
-    // Destructor
+
     ~SkinCareStore();
 
     const std::string& getStoreName() const {
@@ -90,18 +88,16 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const SkinCareStore& store);
 };
 
-// Operator<< for SkinCareProduct
+
 std::ostream& operator<<(std::ostream& out, const SkinCareProduct& product);
 
-// Operator<< for ShoppingCart
+
 std::ostream& operator<<(std::ostream& out, const ShoppingCart& cart);
 
-// Operator<< for SkinCareStore
+
 std::ostream& operator<<(std::ostream& out, const SkinCareStore& store);
 
-// Implementation of member functions
 
-// ShoppingCart
 void ShoppingCart::addProduct(const SkinCareProduct& product) {
     if (cartProducts.size() < maxCapacity) {
         cartProducts.push_back(product);
@@ -121,7 +117,7 @@ void ShoppingCart::displayCart() const {
     }
 }
 
-// SkinCareProduct
+
 SkinCareProduct& SkinCareProduct::operator=(const SkinCareProduct& other) {
     if (this != &other) {
         productName = other.productName;
@@ -135,10 +131,10 @@ SkinCareProduct::~SkinCareProduct() {
 }
 
 void SkinCareProduct::displayProduct() const {
-    std::cout << "Product Name: " << productName << ", Price: " << productPrice << " lei;" << std::endl;
+    std::cout << "Product Name: " << productName << ", Price: " << static_cast<float>(productPrice) << " lei;" << std::endl;
 }
 
-// SkinCareStore
+
 SkinCareStore::SkinCareStore(const SkinCareStore& other)
         : storeName(other.storeName), storeReview(other.storeReview), storeStock(other.storeStock) {}
 
@@ -174,13 +170,13 @@ void SkinCareStore::displayAvailableProducts() const {
     }
 }
 
-// Operator<< for SkinCareProduct
+
 std::ostream& operator<<(std::ostream& out, const SkinCareProduct& product) {
     out << "Product Name: " << product.getProductName() << ", Price: " << product.getProductPrice() << " lei;";
     return out;
 }
 
-// Operator<< for ShoppingCart
+
 std::ostream& operator<<(std::ostream& out, const ShoppingCart& cart) {
     if (cart.cartProducts.empty()) {
         out << "The shopping cart is empty.";
@@ -193,7 +189,7 @@ std::ostream& operator<<(std::ostream& out, const ShoppingCart& cart) {
     return out;
 }
 
-// Operator<< for SkinCareStore
+
 std::ostream& operator<<(std::ostream& out, const SkinCareStore& store) {
     out << "Store Name: " << store.getStoreName() << std::endl;
     out << "Review Score: " << store.getStoreReview() << std::endl;
@@ -204,7 +200,7 @@ std::ostream& operator<<(std::ostream& out, const SkinCareStore& store) {
     return out;
 }
 
-// Main function
+
 int main() {
     SkinCareStore store("Fenty Skin", 4.8);
     SkinCareProduct product1("Facial Cleansing Gel", 76.99);
@@ -226,7 +222,7 @@ int main() {
     std::cout << "The initial shopping cart is empty." << std::endl;
     cart.displayCart();
 
-    std::cout << store; // Using the corrected operator<< function for SkinCareStore
+    std::cout << store;
 
     return 0;
 }
