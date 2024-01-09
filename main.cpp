@@ -1,178 +1,232 @@
 #include <iostream>
-#include <cstring>
+#include <string>
+#include <vector>
 
-class ProdusSkinCare{
-    char nume[30]= "";
-    double pret = 0.0;
-public:
-    ProdusSkinCare() {};
+class SkinCareProduct;
 
-    ///constructor de initializare
-    ProdusSkinCare(char nume_[30], double pret_){
-        strcpy(nume,nume_);
-        pret=pret_;
-    }
-    explicit ProdusSkinCare(const ProdusSkinCare* produs) {
-        strcpy(nume, produs->nume);
-        pret= produs->pret;
-    }
-    virtual ~ProdusSkinCare() {
-    }
-
-    const char *getNume() const {
-        return nume;
-    }
-
-    double getPret() const{
-        return pret;
-    }
-};
-
-class CosCumparaturi{
-    static const int capacitateMaxima=10;
-    ProdusSkinCare produse[capacitateMaxima];
-    int numarProduse =0;
+class ShoppingCart {
+private:
+    static const int maxCapacity = 10;
+    std::vector<SkinCareProduct> cartProducts;
 
 public:
-    CosCumparaturi () {}
-    void AdaugaProdus(const ProdusSkinCare& produs){
-        if (numarProduse<capacitateMaxima) {
-            produse[numarProduse]=produs;
-            numarProduse++;
-        }
-        else{
-            std::cout<< "Cosul de cumparaturi este plin. Nu se mai pot adauga produse."<<std::endl;
-        }
-    }
+    ShoppingCart() = default;
 
-    void AfiseazaCos() const {
-        if (numarProduse == 0) {
-            std::cout<< "Cosul de cumparaturi este gol." << std::endl;
-        }
-        else {
-            std::cout<< "Produsele din cos sunt:"<<std::endl;
-            for(int i =0; i <numarProduse; i ++)
-            {
-                std::cout<<"Nume produs: "<<produse[i].getNume()<<", Pret produs: "<< produse[i].getPret()<<" lei;"<< std::endl;
+    void addProduct(const SkinCareProduct& product);
 
-            }
-        }
-    }
+    void displayCart() const;
+
+    friend std::ostream& operator<<(std::ostream& out, const ShoppingCart& cart);
 };
 
-class MagazinSkinCare {
-    int produse_in_stoc = 0;
-    static const int capacitate_maxima = 400;
-    ProdusSkinCare *produse;
+class SkinCareProduct {
+private:
+    std::string productName;
+    double productPrice = 0.0;
 
 public:
-    MagazinSkinCare(const char *denumire_, float review_) {
-        strcpy(denumire, denumire_);
-        review = review_;
+    SkinCareProduct() = default;
+
+    SkinCareProduct(const std::string& productName, double productPrice)
+            : productName(productName), productPrice(productPrice) {}
+
+    // Copy constructor
+    SkinCareProduct(const SkinCareProduct& other)
+            : productName(other.productName), productPrice(other.productPrice) {}
+
+    // Copy assignment operator
+    SkinCareProduct& operator=(const SkinCareProduct& other);
+
+    // Destructor
+    ~SkinCareProduct();
+
+    const std::string& getProductName() const {
+        return productName;
     }
 
-    MagazinSkinCare(const MagazinSkinCare &magazin) {
-        strcpy(denumire, magazin.denumire);
-        review = magazin.review;
-        produse_in_stoc = magazin.produse_in_stoc;
+    double getProductPrice() const {
+        return productPrice;
     }
 
-    MagazinSkinCare() {
-        denumire[0] = 0;
-    }
+    void displayProduct() const;
 
-    const char* getDenumire() const {
-        return denumire;
-    }
-
-    float getReview() const {
-        return review;
-    }
-
-    ProdusSkinCare* getProdus() const{
-        return produse;
-    };
-
-    void AdaugaStoc(const ProdusSkinCare& produs) {
-        if (produse_in_stoc < capacitate_maxima) {
-            produse[produse_in_stoc] = produs;
-            produse_in_stoc++;
-        } else {
-            std::cout << "Nu mai este loc in magazin!!!" << std::endl;
-        }
-    }
-
-    void AfiseazaProduseDisponibile() const {
-        if (produse_in_stoc == 0) {
-            std::cout << "Vom reveni cu stoc nou curand!" << std::endl;
-        } else {
-            std::cout << "Produsele disponibile in magazinul:" << denumire << "sunt:" << std::endl;
-            for (int i = 0; i < produse_in_stoc; i++) {
-                std::cout << "Nume produs:" << produse[i].getNume() << ", Pret produs: " << produse[i].getPret() << "lei;";
-            }
-        }
-    }
-
-    ~MagazinSkinCare() {
-        std::cout << std::endl << strcat(denumire, "a apelat destructorul") << std::endl;
-    }
-
-    friend std::ostream &operator<<(std::ostream &out, const MagazinSkinCare* magazin);
-
-    friend std::ostream &operator<<(std::ostream &out, const MagazinSkinCare* magazin);
-
-    friend std::istream &operator>>(std::istream &in, MagazinSkinCare *magazin);
-
-    char denumire[30];
-    float review = 0.0;
+    friend std::ostream& operator<<(std::ostream& out, const SkinCareProduct& product);
 };
 
-///supraincarcarea operatorilor << si >>
-std::ostream &operator<<(std::ostream &out, const MagazinSkinCare *magazin) {
-    out << "Numele magazinului: " << magazin->denumire << std::endl;
-    out << "Nota review: " << magazin->review << std::endl;
-    out << "Numarul produselor din stoc:" << magazin->produse_in_stoc << std::endl;
-    for (int i = 0; i < magazin->produse_in_stoc; i++) {
-        std::cout << "Nume produs: " << magazin->produse[i].getNume() << std::endl;
-        std::cout << "Pret: " << magazin->produse[i].getPret() << " lei;" << std::endl;
+class SkinCareStore {
+private:
+    static const int maxStockCapacity = 400;
+    std::string storeName;
+    float storeReview = 0.0;
+    std::vector<SkinCareProduct> storeStock;
+
+public:
+    SkinCareStore() = default;
+
+    SkinCareStore(const std::string& storeName, float storeReview)
+            : storeName(storeName), storeReview(storeReview) {}
+
+    // Copy constructor
+    SkinCareStore(const SkinCareStore& other);
+
+    // Copy assignment operator
+    SkinCareStore& operator=(const SkinCareStore& other);
+
+    // Destructor
+    ~SkinCareStore();
+
+    const std::string& getStoreName() const {
+        return storeName;
+    }
+
+    float getStoreReview() const {
+        return storeReview;
+    }
+
+    void addToStock(const SkinCareProduct& product);
+
+    void displayAvailableProducts() const;
+
+    friend std::ostream& operator<<(std::ostream& out, const SkinCareStore& store);
+};
+
+// Operator<< for SkinCareProduct
+std::ostream& operator<<(std::ostream& out, const SkinCareProduct& product);
+
+// Operator<< for ShoppingCart
+std::ostream& operator<<(std::ostream& out, const ShoppingCart& cart);
+
+// Operator<< for SkinCareStore
+std::ostream& operator<<(std::ostream& out, const SkinCareStore& store);
+
+// Implementation of member functions
+
+// ShoppingCart
+void ShoppingCart::addProduct(const SkinCareProduct& product) {
+    if (cartProducts.size() < maxCapacity) {
+        cartProducts.push_back(product);
+    } else {
+        std::cout << "The shopping cart is full. Cannot add more products." << std::endl;
+    }
+}
+
+void ShoppingCart::displayCart() const {
+    if (cartProducts.empty()) {
+        std::cout << "The shopping cart is empty." << std::endl;
+    } else {
+        std::cout << "Products in the cart:" << std::endl;
+        for (const auto& product : cartProducts) {
+            product.displayProduct();
+        }
+    }
+}
+
+// SkinCareProduct
+SkinCareProduct& SkinCareProduct::operator=(const SkinCareProduct& other) {
+    if (this != &other) {
+        productName = other.productName;
+        productPrice = other.productPrice;
+    }
+    return *this;
+}
+
+SkinCareProduct::~SkinCareProduct() {
+    std::cout << "Destroyed SkinCareProduct: " << productName << std::endl;
+}
+
+void SkinCareProduct::displayProduct() const {
+    std::cout << "Product Name: " << productName << ", Price: " << productPrice << " lei;" << std::endl;
+}
+
+// SkinCareStore
+SkinCareStore::SkinCareStore(const SkinCareStore& other)
+        : storeName(other.storeName), storeReview(other.storeReview), storeStock(other.storeStock) {}
+
+SkinCareStore& SkinCareStore::operator=(const SkinCareStore& other) {
+    if (this != &other) {
+        storeName = other.storeName;
+        storeReview = other.storeReview;
+        storeStock = other.storeStock;
+    }
+    return *this;
+}
+
+SkinCareStore::~SkinCareStore() {
+    std::cout << std::endl << storeName << " store called the destructor." << std::endl;
+}
+
+void SkinCareStore::addToStock(const SkinCareProduct& product) {
+    if (storeStock.size() < maxStockCapacity) {
+        storeStock.push_back(product);
+    } else {
+        std::cout << "No more space in the store!!!" << std::endl;
+    }
+}
+
+void SkinCareStore::displayAvailableProducts() const {
+    if (storeStock.empty()) {
+        std::cout << "We will restock soon!" << std::endl;
+    } else {
+        std::cout << "Available products in the store " << storeName << " are:" << std::endl;
+        for (const auto& product : storeStock) {
+            product.displayProduct();
+        }
+    }
+}
+
+// Operator<< for SkinCareProduct
+std::ostream& operator<<(std::ostream& out, const SkinCareProduct& product) {
+    out << "Product Name: " << product.getProductName() << ", Price: " << product.getProductPrice() << " lei;";
+    return out;
+}
+
+// Operator<< for ShoppingCart
+std::ostream& operator<<(std::ostream& out, const ShoppingCart& cart) {
+    if (cart.cartProducts.empty()) {
+        out << "The shopping cart is empty.";
+    } else {
+        out << "Products in the cart:" << std::endl;
+        for (const auto& product : cart.cartProducts) {
+            out << product << std::endl;
+        }
     }
     return out;
 }
 
-std::ostream& operator<<(std::ostream &out, const MagazinSkinCare *magazin);
-
-std::istream &operator>>(std::istream &in, MagazinSkinCare &magazin) {
-   std::cout << std::endl << "Numele magazinului: ";
-    in >> magazin.denumire;
-    std::cout << std::endl << "Nota review: ";
-    in >> magazin.review;
-    return in;
+// Operator<< for SkinCareStore
+std::ostream& operator<<(std::ostream& out, const SkinCareStore& store) {
+    out << "Store Name: " << store.getStoreName() << std::endl;
+    out << "Review Score: " << store.getStoreReview() << std::endl;
+    out << "Number of products in stock: " << store.storeStock.size() << std::endl;
+    for (const auto& product : store.storeStock) {
+        out << product << std::endl;
+    }
+    return out;
 }
-/*ProdusSkinCare* citesteProdusNou() {
-    char t[30];
-    int p;
-    std::cin >> t >> p;
-    return new ProdusSkinCare(t, p);*/
 
+// Main function
 int main() {
-    MagazinSkinCare magazin("Fenty Skin", 4.8);
-    ProdusSkinCare produs1("Gel de curatare de fata", 76.99);
-    ProdusSkinCare produs2 ("Crema Hidratanta", 82.99);
-    ProdusSkinCare produs3 ("Crema de ochi", 56.99);
-    magazin.AdaugaStoc(produs1);
-    magazin.AdaugaStoc(produs2);
-    magazin.AdaugaStoc(produs3);
-    CosCumparaturi cos;
+    SkinCareStore store("Fenty Skin", 4.8);
+    SkinCareProduct product1("Facial Cleansing Gel", 76.99);
+    SkinCareProduct product2("Moisturizing Cream", 82.99);
+    SkinCareProduct product3("Eye Cream", 56.99);
 
-    cos.AdaugaProdus(produs2);
-    cos.AdaugaProdus(produs3);
+    store.addToStock(product1);
+    store.addToStock(product2);
+    store.addToStock(product3);
 
-   std:: cout<<"Bine ati venit la "<< magazin.getDenumire()<<" cu rating "<< magazin.getReview()<<"!"<<std::endl;
-    std::cout<<"Produsele disponibile in magazin sunt:"<<std::endl;
-    magazin.AfiseazaProduseDisponibile();
+    ShoppingCart cart;
+    cart.addProduct(product2);
+    cart.addProduct(product3);
 
-    std::cout<< "Cosul de cumparaturi initial este gol.";
+    std::cout << "Welcome to " << store.getStoreName() << " with a rating of " << store.getStoreReview() << "!" << std::endl;
+    std::cout << "Available products in the store are:" << std::endl;
+    store.displayAvailableProducts();
 
-    cos.AfiseazaCos();
+    std::cout << "The initial shopping cart is empty." << std::endl;
+    cart.displayCart();
+
+    std::cout << store; // Using the corrected operator<< function for SkinCareStore
+
     return 0;
 }
